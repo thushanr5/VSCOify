@@ -1,0 +1,30 @@
+{
+  "name": "Something",
+  "description": "Some thing",
+  "version": "1.0",
+  "permissions": ["activeTab", "scripting"],
+  "manifest_version": 3,
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["https://vsco.co/*/gallery", "https://vsco.co/*/media/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'",
+    "content_scripts": [
+      {
+        "matches": ["https://vsco.co/*/gallery", "https://vsco.co/*/media/*"],
+        "js": ["content.js"],
+        "script-src": ["'self'", "https://cdn.jsdelivr.net/"],
+        "script-src-elem": ["'self'", "https://cdn.jsdelivr.net/"]
+      }
+    ]
+  }
+}
