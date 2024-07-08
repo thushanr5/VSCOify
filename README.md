@@ -1,1 +1,1 @@
-# VSCO Image Saver Chromee Extension
+# VSCO Image Saver Chrome Extension
