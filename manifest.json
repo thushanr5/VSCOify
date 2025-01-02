@@ -26,5 +26,9 @@
         "script-src-elem": ["'self'", "https://cdn.jsdelivr.net/"]
       }
     ]
-  }
+  },
+  "web_accessible_resources": [{
+    "resources": ["tensorflow.min.js", "mobilenet.min.js"],
+    "matches": ["<all_urls>"]
+  }]
 }
