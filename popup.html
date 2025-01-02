@@ -4,123 +4,179 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VSCO Lifestyle</title>
-    <link rel="stylesheet" href="popup.css">
-</head>
-<body>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-    }
+        body {
+            width: 400px;
+            background: #f5f5f5;
+            padding: 16px;
+        }
 
-    .container {
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 90%;
-        max-width: 800px;
-        margin: 20px auto;
-    }
-
-    h1 {
-        font-size: 1.5em;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    form {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .form-group {
-        margin-bottom: 15px;
-    }
-
-    label {
-        font-weight: bold;
-        margin-bottom: 5px;
-        display: block;
-    }
-
-    input[type="text"], input[type="date"] {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-
-    button {
-        padding: 10px;
-        border: none;
-        border-radius: 4px;
-        background-color: #4CAF50;
-        color: white;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background-color: #45a049;
-    }
-
-    @media (max-width: 600px) {
         .container {
-            padding: 10px;
-            margin: 10px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         h1 {
-            font-size: 1.2em;
+            background: linear-gradient(135deg, #9333ea, #ec4899);
+            color: white;
+            padding: 16px;
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        input[type="text"], input[type="date"] {
-            padding: 8px;
+        .form-group {
+            padding: 0 16px;
+            margin-bottom: 16px;
         }
-    }
 
-    .centerBtn{
-        display: block; 
-        margin: 0 auto;
-    }
-    
-    img {
-        width: 100%;
-        height: auto;
-        border-radius: 4px;
-    }
-</style>
+        label {
+            display: block;
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 6px;
+        }
 
-<div class="container">
-    <h1>VSCO Lifestyle</h1>
+        input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+        }
 
-    <form id="form">
-        <div class="form-group">
-            <button type="button" id="image_title_btn" class="centerBtn">Extract VSCO Post</button>
-        </div>
-        <div class="form-group">
-            <label for="image_title">Title of Image:</label>
-            <input type="text" id="image_title" value="Default Name (None Specified)">
-        </div>
-        <div class="form-group">
-            <label for="image_date">Date of Image:</label>
-            <input type="date" id="image_date">
-        </div>
-        <div class="form-group">
-            <img src="dummy.jpg" id="selectedImage" alt="Selected Image">
-        </div>
-        <div class="form-group">
-            <label for="image_location">Save Post Info:</label>
-            <button type="submit" id="submitDataForm">Save Data</button>
-        </div>
-    </form>
-</div>
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #9333ea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
 
-<script src="popup.js"></script>
+        button:hover {
+            background: #7e22ce;
+        }
 
+        #selectedImage {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin: 8px 0;
+        }
 
+        #predictions {
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 16px;
+            font-size: 14px;
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+            color: #374151;
+        }
+
+        .confidence {
+            color: #9333ea;
+            font-weight: 600;
+        }
+
+        #analyze-btn {
+            background: #4f46e5;
+        }
+
+        #analyze-btn:hover {
+            background: #4338ca;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VSCO Lifestyle</h1>
+        <form id="form">
+            <div class="form-group">
+                <button type="button" id="image_title_btn">Extract VSCO Post</button>
+            </div>
+            <div class="form-group">
+                <label for="image_title">Title of Image:</label>
+                <input type="text" id="image_title" placeholder="Default Name (None Specified)">
+            </div>
+            <div class="form-group">
+                <label for="image_date">Date of Image:</label>
+                <input type="date" id="image_date">
+            </div>
+            <div class="form-group">
+                <img src="dummy.jpg" id="selectedImage" alt="Selected Image" crossorigin="anonymous">
+                <button type="button" id="analyze-btn">Analyze Image</button>
+                <div id="predictions"></div>
+            </div>
+            <div class="form-group">
+                <button type="submit" id="submitDataForm">Save Data</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        // Previous code remains the same until the TensorFlow.js additions
+
+        let model;
+        
+        // Load MobileNet model
+        async function loadModel() {
+            model = await mobilenet.load();
+            document.getElementById('analyze-btn').disabled = false;
+        }
+
+        // Initialize model on load
+        loadModel();
+
+        // Analyze image function
+        async function analyzeImage() {
+            const img = document.getElementById('selectedImage');
+            const predictions = await model.classify(img);
+            
+            const predictionsDiv = document.getElementById('predictions');
+            predictionsDiv.innerHTML = '<label>Image Analysis:</label>';
+            
+            predictions.forEach(prediction => {
+                const predictionEl = document.createElement('div');
+                predictionEl.className = 'prediction-item';
+                predictionEl.innerHTML = `
+                    <span>${prediction.className}</span>
+                    <span class="confidence">${(prediction.probability * 100).toFixed(1)}%</span>
+                `;
+                predictionsDiv.appendChild(predictionEl);
+            });
+
+            // Auto-fill title if empty
+            const titleInput = document.getElementById('image_title');
+            if (!titleInput.value) {
+                titleInput.value = predictions[0].className;
+            }
+        }
+
+        document.getElementById('analyze-btn').addEventListener('click', analyzeImage);
+
+        // Original event listeners and functions remain the same
+    </script>
+    <script src="popup.js"></script>
 </body>
 </html>
