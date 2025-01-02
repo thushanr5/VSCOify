@@ -147,3 +147,25 @@ function saveFormData() {
         console.log(savedFileString);
     })
 }
+
+document.getElementById('image_title_btn').addEventListener('click', () => {
+    // Simulate extracting VSCO post data
+    const title = "VSCO Extracted Title";
+    const date = new Date().toISOString().split('T')[0];
+    const imgSrc = "https://via.placeholder.com/400";
+
+    document.getElementById('image_title').value = title;
+    document.getElementById('image_date').value = date;
+    document.getElementById('selectedImage').src = imgSrc;
+});
+
+document.getElementById('form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const title = document.getElementById('image_title').value;
+    const date = document.getElementById('image_date').value;
+    const imgSrc = document.getElementById('selectedImage').src;
+
+    console.log("Data saved:", { title, date, imgSrc });
+    alert("Data saved successfully!");
+});
+
